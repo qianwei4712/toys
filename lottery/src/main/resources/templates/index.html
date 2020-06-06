@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>控制台界面</title>
+    <script th:src="@{~/jquery-1.11.3.min.js}"></script>
+</head>
+<body>
+<input class="num" />
+<button class="step">Let's go!</button>
+
+<script th:inline="javascript">
+    $(document).ready(function(){
+
+        $(document).on('click','.step',function () {
+            $.ajax({
+                url:'/gogogo',
+                data:{ num: $('.num').val() },
+                success:function (res) {
+                    console.log(res);
+                }
+            });
+
+        });
+
+    });
+</script>
+</body>
+</html>

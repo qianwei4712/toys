@@ -35,6 +35,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- spring推荐的thymeleaf页面模板 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

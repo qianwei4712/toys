@@ -1,0 +1,15 @@
+server:
+  port: 80
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+
+
+
+
+threadpool:
+  core-pool-size: 40
+  max-pool-size: 80
+  queue-capacity: 1000
+  keep-alive-seconds: 600
