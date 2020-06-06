@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author shiva   2020/6/5 19:23
@@ -34,37 +33,30 @@ public class HandleService {
         //返回最后一页页码，最后一页条数
         int[] page = CommonUtil.calc(num);
         //计数器，判断线程是否执行结束
-        AtomicBoolean flag = new AtomicBoolean(false);
-        CountDownLatch taskLatch = new CountDownLatch(page[1] + (page[0])*20);
-        threadPool.asyncServiceExecutor().execute(() -> {
-            try {
-                //开始等待
-                taskLatch.await();
-                System.out.println("任务执行结束");
-                flag.set(true);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
+        CountDownLatch taskLatch = new CountDownLatch(page[0]);
 
         //遍历开始
         for (int i = 1; i < page[0]; i++) {
             int finalIndex = i;
-            threadPool.asyncServiceExecutor().execute(() -> busHandle(finalIndex,20));
+            threadPool.asyncServiceExecutor().execute(() -> {
+                busHandle(finalIndex,20);
+                System.out.println("第" + finalIndex + "条线程执行结束；");
+                taskLatch.countDown();
+            });
         }
-        threadPool.asyncServiceExecutor().execute(() -> busHandle(page[0], page[1]));
+        threadPool.asyncServiceExecutor().execute(() -> {
+            busHandle(page[0], page[1]);
+            System.out.println("最后一条线程执行结束；");
+            taskLatch.countDown();
+        });
 
-        
         try {
-            while (!flag.get()){
-                taskLatch.getCount();
-                Thread.sleep(2000);
-            }
+            taskLatch.await();
+            System.out.println("执行完毕！");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        System.out.println(1);
     }
 
 
@@ -82,7 +74,7 @@ public class HandleService {
             //每一个tr都是一期
             String[] items = trItem.split("<tr>");
             //遍历每一期
-            for (int j = 0; j < itemNum; j++) {
+            for (int j = 0; j <= itemNum; j++) {
                 String[] tdItems = items[j].split("<td");
                 if (tdItems.length < 9){
                     continue ;
@@ -90,7 +82,7 @@ public class HandleService {
                 for (int i = 2; i < 9; i++) {
                     String str = tdItems[i];
                     int finalIdex = i - 2;
-                    threadPool.asyncServiceExecutor().execute(() -> dataHandle(result.get(finalIdex), str));
+                    dataHandle(result.get(finalIdex), str);
                 }
             }
         } catch (Exception e) {
@@ -104,7 +96,7 @@ public class HandleService {
      */
     private void dataHandle(ConcurrentHashMap<String, Integer> currMap, String str){
         //先把未处理的字符串，选出数组
-        String num = str.substring(str.indexOf("\">"), str.indexOf("</td>"));
+        String num = str.substring(str.indexOf("\">") + 2, str.indexOf("</td>"));
         if (currMap.containsKey(num)){
             //存在则加1
             currMap.put(num, currMap.get(num) + 1);

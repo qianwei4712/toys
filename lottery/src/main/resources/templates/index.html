@@ -8,6 +8,21 @@
 <body>
 <input class="num" />
 <button class="step">Let's go!</button>
+<div style="height: 40px;color: red; font-size: 20px;line-height: 20px">
+    总共 1977 条记录，在上方输入需要计算的期数<br>
+    按 7 位数顺序输出
+</div>
+
+
+<div style="height: 40px; font-size: 20px;line-height: 20px">
+    转到 JSON 格式化去看直观点：<a href="https://www.json.cn/" target="_blank">https://www.json.cn/</a>
+</div>
+
+<div class="content">
+
+</div>
+
+
 
 <script th:inline="javascript">
     $(document).ready(function(){
@@ -17,7 +32,8 @@
                 url:'/gogogo',
                 data:{ num: $('.num').val() },
                 success:function (res) {
-                    console.log(res);
+                    var jsonStr = JSON.stringify(res);
+                    $('.content').text(jsonStr);
                 }
             });
 
